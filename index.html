@@ -12,11 +12,15 @@
     />
     <script src="https://unpkg.com/feather-icons"></script>
     <link rel="stylesheet" href="css/style.css" />
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
   </head>
   <body>
     <!-- Navbar start -->
 
-    <nav class="navbar">
+    <nav class="navbar" x-data>
       <a href="#" class="navbar-logo">KEDAI MEDAN | <span>Kak Inong</span></a>
 
       <div class="navbar-nav">
@@ -27,10 +31,89 @@
       </div>
 
       <div class="navbar-extra">
-        <a href="#" id="search"><i data-feather="search"></i></a>
-        <a href="#" id="shopping-cart"><i data-feather="shopping-cart"></i></a>
-        <a href="#" id="menu"><i data-feather="menu"></i></a>
+        <a href="#" id="shopping-cart" @click.prevent
+          ><i data-feather="shopping-cart"></i>
+          <span
+            class="quantity"
+            x-show="$store.cart.quantity"
+            x-text="$store.cart.quantity"
+          ></span
+        ></a>
+        <a href="#" id="menu" x-data @click.prevent
+          ><i data-feather="menu"></i
+        ></a>
       </div>
+      <!-- shopping-cart start -->
+      <div class="shopping-cart" id="shopping-cart-item">
+        <template x-for="(item, index) in $store.cart.items" x-keys="index">
+          <div class="cart-item">
+            <img
+              :src="`image/menu/${item.img}`"
+              alt="item.name"
+              width="80px"
+              height="80px"
+            />
+            <div class="item-detail">
+              <h3 x-text="item.name"></h3>
+              <div class="item-price">
+                <span x-text="rupiah(item.price)"> </span> &times;
+                <button id="remove" @click="$store.cart.remove(item.id)">
+                  &minus;
+                </button>
+                <span x-text="item.quantity"></span>
+                <button id="add" @click="$store.cart.add(item)">&plus;</button>
+                &equals;
+                <span x-text="rupiah(item.total)"></span>
+              </div>
+            </div>
+          </div>
+        </template>
+        <h4 x-show="!$store.cart.items.length" style="margin-top: 1rem">
+          Tidak ada produk
+        </h4>
+        <h4 x-show="$store.cart.items.length">
+          Total : <span x-text="rupiah($store.cart.total)"></span>
+        </h4>
+        <div class="form-container" x-show="$store.cart.items.length">
+          <form action="" id="checkoutForm">
+            <input
+              type="hidden"
+              name="items"
+              x-model="JSON.stringify($store.cart.items)"
+            />
+            <input type="hidden" name="total" x-model="$store.cart.total" />
+            <h5>Data Pelanggan</h5>
+            <label for="name">
+              <span>Nama</span>
+              <input type="text" name="name" id="name" class="nama-input" />
+            </label>
+            <label for="email">
+              <span>Email</span>
+              <input type="email" name="email" id="email" class="email-input" />
+            </label>
+            <label for="phone">
+              <span>No.HP</span>
+              <input
+                type="number"
+                name="phone"
+                id="phone"
+                autocomplete="off"
+                class="phone-input"
+              />
+            </label>
+            <button
+              class="checkout-button disabled"
+              type="submit"
+              id="checkout-button"
+              value="checkout"
+              @click.prevent
+            >
+              checkout
+            </button>
+          </form>
+        </div>
+      </div>
+      <!-- shopping-cart end -->
     </nav>
 
     <!-- Navbar end -->
@@ -38,7 +121,7 @@
     <!-- hero section star -->
     <section class="hero" id="home">
       <main class="content">
-        <a href="#" class="cta">Beli Sekarang</a>
+        <a href="#menu-section" class="cta">Beli Sekarang</a>
         <div class="banner">
           <video autoplay loop muted>
             <source src="image/kedan-bg4.mp4" />
@@ -62,7 +145,6 @@
     <section class="about" id="about">
       <br /><br /><br /><br />
       <h2><span>Tentang</span> Kami</h2>
-
       <table>
         <tr>
           <td>
@@ -197,7 +279,7 @@
     <!-- about section end-->
 
     <!-- menu section start-->
-    <section class="menu-section" id="menu-section">
+    <section class="menu-section" id="menu-section" x-data="products">
       <br /><br /><br /><br />
       <h2><span>Menu</span> Kami</h2>
       <p>
@@ -206,307 +288,63 @@
       </p>
       <h2><i>--Makanan--</i></h2>
       <div class="row">
-        <div class="menu-card">
-          <img
-            src="image/menu/makanan/indomie-nyemek.jpg"
-            alt="indomie-nyemek"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Indomie Nyemek-</h3>
-          <p class="menu-card-price">Rp. 15.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/makanan/lontong-rendang.jpg"
-            alt="lontong-rendang"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Lontong Rendang-</h3>
-          <p class="menu-card-price">Rp. 25.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/makanan/lupis.jpg"
-            alt="Lupis"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Lupis-</h3>
-          <p class="menu-card-price">Rp. 10.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/makanan/nasi-goreng.jpg"
-            alt="nasi-goreng"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Nasi Goreng-</h3>
-          <p class="menu-card-price">Rp. 15.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/makanan/nasi-gurih-ayam.jpg"
-            alt="nasi-gurih-ayam"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Nasi Gurih Ayam-</h3>
-          <p class="menu-card-price">Rp. 23.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/makanan/nasi-gurih-rendang.jpg"
-            alt="nasi-gurih-rendang"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Nasi Gurih Rendang-</h3>
-          <p class="menu-card-price">Rp. 25.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/makanan/nasi-gurih-telur.jpg"
-            alt="nasi-gurih-telur"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Nasi Gurih Telur-</h3>
-          <p class="menu-card-price">Rp. 18.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/makanan/nasi-gurih.jpg"
-            alt="nasi-gurih"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Nasi Gurih-</h3>
-          <p class="menu-card-price">Rp. 13.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/makanan/soto-medan.jpg"
-            alt="soto-medan"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Soto Medan-</h3>
-          <p class="menu-card-price">Rp. 15.000</p>
-        </div>
+        <template x-for="(item, index) in items" x-key="index">
+          <div class="menu-card">
+            <img
+              :src="`image/menu/${item.img}`"
+              :alt="item.name"
+              class="menu-card-image"
+              width="220px"
+              height="220px"
+            />
+            <h3 class="menu-card-title" x-text="item.name"></h3>
+            <p class="menu-card-price">
+              <span x-text="rupiah(item.price)"></span>
+            </p>
+            <div class="icon">
+              <a href="#" @click.prevent="$store.cart.add(item)"
+                ><span>Beli Sekarang</span></a
+              >
+            </div>
+          </div>
+        </template>
       </div>
+    </section>
+    <section class="menu-section" id="menu-section" x-data="products2">
       <h2><i>--Minuman--</i></h2>
       <div class="row">
-        <div class="menu-card">
-          <img
-            src="image/menu/minum/afogato.jpg"
-            alt="afogato"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Affogato-</h3>
-          <p class="menu-card-price">Rp. 15.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/minum/blueberry-yakult.jpg"
-            alt="blueberry-yakult"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Blueberry Yakult-</h3>
-          <p class="menu-card-price">Rp. 13.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/minum/caramel-maciato.jpg"
-            alt="caramel-maciato"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Caramel Macchiato-</h3>
-          <p class="menu-card-price">Rp. 20.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/minum/coffee-latte.jpg"
-            alt="coffee-latte"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Coffee Latte-</h3>
-          <p class="menu-card-price">Rp. 15.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/minum/es-americano.jpg"
-            alt="es-americano"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Es Americano-</h3>
-          <p class="menu-card-price">Rp. 10.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/minum/es-coklat.jpg"
-            alt="es-coklat"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Es Coklat-</h3>
-          <p class="menu-card-price">Rp. 13.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/minum/es-markisa.jpg"
-            alt="es-markisa"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Es Markisa-</h3>
-          <p class="menu-card-price">Rp. 10.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/minum/es-markul.jpg"
-            alt="es-markul"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Es Markul-</h3>
-          <p class="menu-card-price">Rp. 13.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/minum/es-timun.jpg"
-            alt="es-timun"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Es Timun-</h3>
-          <p class="menu-card-price">Rp. 10.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/minum/happy-squash.jpg"
-            alt="happy-squash"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Happy Squash-</h3>
-          <p class="menu-card-price">Rp. 15.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/minum/happy-tea.jpg"
-            alt="happy-tea"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Happy Tea-</h3>
-          <p class="menu-card-price">Rp. 10.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/minum/hot-red-velvet.jpg"
-            alt="hot-red-velvet"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Hot Red Velvet-</h3>
-          <p class="menu-card-price">Rp. 15.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/minum/kopi-tarik.jpg"
-            alt="kopi-tarik"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Kopi Tarik-</h3>
-          <p class="menu-card-price">Rp. 15.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/minum/kopsuren.jpg"
-            alt="kopsuren"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Kopsuren-</h3>
-          <p class="menu-card-price">Rp. 15.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/minum/red-velvet.jpg"
-            alt="red-velvet"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Ice Red Velvet-</h3>
-          <p class="menu-card-price">Rp. 15.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/minum/salted-caramel.jpg"
-            alt="salted-caramel"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Salted Caramel-</h3>
-          <p class="menu-card-price">Rp. 15.000</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="image/menu/minum/sunrise.jpg"
-            alt="sunrise"
-            class="menu-card-image"
-            width="220px"
-            height="220px"
-          />
-          <h3 class="menu-card-title">-Sunrise-</h3>
-          <p class="menu-card-price">Rp. 15.000</p>
-        </div>
+        <template x-for="(item, index) in items2" x-key="index">
+          <div class="menu-card">
+            <img
+              :src="`image/menu/${item.img}`"
+              :alt="item.name"
+              class="menu-card-image"
+              width="220px"
+              height="220px"
+            />
+            <h3 class="menu-card-title" x-text="item.name"></h3>
+            <p class="menu-card-price">
+              <span x-text="rupiah(item.price)"></span>
+            </p>
+            <div class="icon">
+              <a href="#" @click.prevent="$store.cart.add(item)"
+                ><span>Beli Sekarang</span></a
+              >
+            </div>
+          </div>
+        </template>
       </div>
     </section>
     <!-- menu section end-->
 
     <!-- contact section start -->
-    <section class="contact" id="contact">
+    <section class="contact" id="contact" x-data>
       <br /><br /><br /><br />
       <h2><span>Hubungi</span> Kami</h2>
       <p>
         Jika kamu ingin bantuan atau memiliki masukan, silakan hubungi kami: ·
-        Jam 09:00 - 18:00 · Email : customercare@erajaya.com · Contact Center :
-        1500372.
+        Jam 07:00 - 15:00 · Email : kedankakinong@gmail.com · Contact Center :
+        08976488886.
       </p>
 
       <div class="row">
@@ -517,20 +355,44 @@
           referrerpolicy="no-referrer-when-downgrade"
           class="map"
         ></iframe>
-        <form action="">
+        <form action="" id="formPesan">
           <div class="input-group">
             <i data-feather="user"></i>
-            <input type="text" placeholder="Masukkan nama anda" />
+            <input
+              type="text"
+              placeholder="Masukkan nama anda"
+              name="name2"
+              id="name2"
+            />
           </div>
           <div class="input-group">
             <i data-feather="mail"></i>
-            <input type="text" placeholder="Masukkan email anda" />
+            <input
+              type="text"
+              placeholder="Masukkan email anda"
+              name="email2"
+              id="email2"
+            />
           </div>
           <div class="input-group">
             <i data-feather="phone"></i>
-            <input type="text" placeholder="Masukkan no.hp anda" />
+            <input
+              type="text"
+              placeholder="Masukkan no.hp anda"
+              name="phone2"
+              id="phone2"
+            />
           </div>
-          <button type="submit" class="btn">Kirim Pesan</button>
+          <div class="input-group">
+            <i data-feather="inbox"></i>
+            <input
+              type="text"
+              placeholder="Masukkan pesan anda"
+              name="pesan2"
+              id="pesan2"
+            />
+          </div>
+          <button type="submit" class="btn" value="Kirim">Kirim</button>
         </form>
       </div>
     </section>
@@ -563,5 +425,6 @@
       feather.replace();
     </script>
     <script src="js/script.js"></script>
+    <script src="src/app.js"></script>
   </body>
 </html>
